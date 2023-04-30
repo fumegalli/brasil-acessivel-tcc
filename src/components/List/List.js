@@ -74,7 +74,7 @@ const List = ({ places, type, setType, rating, setAssistant, setRating, disabili
             </Select>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <FormControlLabel control={<Checkbox onChange={(e) => setAssistant(e.target.checked)} />} label="Assistênte de Acessibilidade" />
+            <FormControlLabel control={<Checkbox onChange={(e) => setAssistant(e.target.checked)} />} label="Assistente de Acessibilidade" />
           </FormControl>
           <Grid container spacing={3} className={classes.list}>
             {places?.map((place, i) => (
