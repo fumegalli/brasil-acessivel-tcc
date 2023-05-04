@@ -1,26 +1,37 @@
-import React from 'react';
 import { useState } from "react";
-import { Box, Typography, Button, Card, CardMedia, CardContent, FormGroup, FormControlLabel, Checkbox } from '@material-ui/core';
+import { Box, Typography, Button, Card, CardMedia, CardContent, Snackbar } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
 import LocationOnIcon from '@material-ui/icons/LocationOn';
 import PhoneIcon from '@material-ui/icons/Phone';
 import Rating from '@material-ui/lab/Rating';
+import ReportAccessibility from '../ReportAccessibility/ReportAccessibility.js';
 
 import useStyles from './styles.js';
 
+const FEATURES = {
+  muteness: "Pessoa que não fala",
+  blindness: "Pessoas que não enxergam",
+  guideDog: "Cão Guia",
+  hearingImpairment: "Pessoa com baixa audição",
+  learningImpairment: "Pessoa com dificuldades cognitivas",
+  mobilityImpairment: "Pessoa com baixa mobilidade",
+  visualImpairment: "Pessoa com baixa visão",
+  wheelchair: "Pessoa que usa cadeira de rodas",
+}
+
 const PlaceDetails = ({ place }) => {
-  const [blindness, setBlindness] = useState(false);
-  const [guideDog, setGuideDog] = useState(false);
-  const [hearingImpairment, setHearingImpairment] = useState(false);
-  const [learningImpairment, setLearningImpairment] = useState(false);
-  const [mobilityImpairment, setMobilityImpairment] = useState(false);
-  const [muteness, setMuteness] = useState(false);
-  const [visualImpairment, setVisualImpairment] = useState(false);
-  const [wheelchair, setWheelchair] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSuccessSnackbarOpen, setIsSuccessSnackbarOpen] = useState(false);
+  const [isErrorSnackbarOpen, setIsErrorSnackbarOpen] = useState(false);
 
   const classes = useStyles();
 
-  function reportAcessibility() {
-    console.log('Local:', place);
+  function onOpenModal() {
+    setIsModalOpen(true);
+  }
+
+  function onCloseModal() {
+    setIsModalOpen(false)
   }
 
   return (
@@ -32,40 +43,65 @@ const PlaceDetails = ({ place }) => {
       />
       <CardContent>
         <Typography gutterBottom variant="h5">{place.name}</Typography>
-        <Box display="flex" justifyContent="space-between" my={2}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" my={2}>
           <Rating name="read-only" value={Number(place.rating)} readOnly />
+          <Button variant="outlined" onClick={onOpenModal}>Avaliar</Button>
         </Box>
-        <Box display="flex" justifyContent="space-between">
-          <FormGroup>
+        {place.accessibleFeatures?.length > 0 && <Box display="flex" justifyContent="space-between">
+          <Box>
             <Typography gutterBottom variant="h6">Local é acessível para:</Typography>
-            <FormControlLabel control={<Checkbox onChange={e => setBlindness(e.target.checked)} />} label="Pessoas que não enxergam" />
-            <FormControlLabel control={<Checkbox onChange={e => setGuideDog(e.target.checked)} />} label="Cão Guia" />
-            <FormControlLabel control={<Checkbox onChange={e => setHearingImpairment(e.target.checked)} />} label="Pessoa com baixa audição" />
-            <FormControlLabel control={<Checkbox onChange={e => setLearningImpairment(e.target.checked)} />} label="Pessoa com dificuldades cognitivas" />
-            <FormControlLabel control={<Checkbox onChange={e => setMobilityImpairment(e.target.checked)} />} label="Pessoa com baixa mobilidade" />
-            <FormControlLabel control={<Checkbox onChange={e => setMuteness(e.target.checked)} />} label="Pessoa que não fala" />
-            <FormControlLabel control={<Checkbox onChange={e => setVisualImpairment(e.target.checked)} />} label="Pessoa com baixa visão" />
-            <FormControlLabel control={<Checkbox onChange={e => setWheelchair(e.target.checked)} />} label="Pessoa que usa cadeira de rodas" />
-            <Button variant="outlined" onClick={() => reportAcessibility(place.location_id)}>Reportar</Button>
-          </FormGroup>
+            {place.accessibleFeatures.map(({name, reportsQuantity}, index) => {
+              if (reportsQuantity === 0) return null
+              return (
+                <Box display="flex" marginX={0} mb="5px" key={index}>
+                  <Typography className={classes.feature}>{FEATURES[name]}</Typography>
+                  <Typography className={classes.reportsQuantity} variant="caption" color="textSecondary"> {`(${reportsQuantity} ${reportsQuantity > 1 ? 'avaliações' : 'avaliação'})`}</Typography>
+                </Box>
+              )
+            })}
+          </Box>
+        </Box>}
+        <Box mt="15px">
+          {place.address && (
+            <Typography gutterBottom variant="body2" color="textSecondary" className={classes.subtitle}>
+              <LocationOnIcon />{place.address}
+            </Typography>
+          )}
+          {place.phone && (
+            <Typography variant="body2" color="textSecondary" className={classes.spacing}>
+              <PhoneIcon /> {place.phone}
+            </Typography>
+          )}
         </Box>
-        <Box display="flex" justifyContent="space-between">
-          <Typography component="legend">Accesibilidade para cadeira de rodas</Typography>
-          <Typography gutterBottom variant="subtitle1">
-            {place.accessibility?.accessibleWith?.wheelchair ? "Sim" : "Não"}
-          </Typography>
-        </Box>
-        {place.address && (
-          <Typography gutterBottom variant="body2" color="textSecondary" className={classes.subtitle}>
-            <LocationOnIcon />{place.address}
-          </Typography>
-        )}
-        {place.phone && (
-          <Typography variant="body2" color="textSecondary" className={classes.spacing}>
-            <PhoneIcon /> {place.phone}
-          </Typography>
-        )}
       </CardContent>
+      <ReportAccessibility
+        isOpen={isModalOpen}
+        handleClose={onCloseModal}
+        placeName={place.name}
+        placeId={place.id}
+        handleSuccessSnackbar={setIsSuccessSnackbarOpen}
+        handleErrorSnackbar={setIsErrorSnackbarOpen}
+      />
+      <Snackbar
+        open={isSuccessSnackbarOpen}
+        onClose={() => setIsSuccessSnackbarOpen(false)}
+        autoHideDuration={10000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert variant="filled" onClose={() => setIsSuccessSnackbarOpen(false)} severity="success" sx={{ width: '100%' }}>
+          Avaliação enviada com sucesso! 
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={isErrorSnackbarOpen}
+        onClose={() => setIsErrorSnackbarOpen(false)}
+        autoHideDuration={10000}
+        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      >
+        <Alert variant="filled" onClose={() => setIsErrorSnackbarOpen(false)} severity="error" sx={{ width: '100%' }}>
+          Erro ao enviar avaliação! 
+        </Alert>
+      </Snackbar>
     </Card>
   );
 };

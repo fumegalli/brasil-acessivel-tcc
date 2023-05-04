@@ -5,6 +5,7 @@ import { getAccessiblePlacesData } from './api/accessibilityCloudAPI';
 import Header from './components/Header/Header';
 import List from './components/List/List';
 import Map from './components/Map/Map';
+import { getPlacesReportsData } from './api/brasilAcessivelAPI';
 
 const App = () => {
   const [places, setPlaces] = useState([]);
@@ -64,6 +65,12 @@ const App = () => {
             };
           });
           console.log('Accessible Places:', ap);
+          getPlacesReportsData({ places: ap }).then(({places}) => {
+            ap.forEach((place) => {
+              const placeReport = places.find(({ id }) => id === place.id)
+              if (placeReport) place.accessibleFeatures = placeReport.accessibleFeatures || [];
+            });
+          });
           setPlaces(ap);
           setFilteredPlaces(ap);
           setIsLoading(false);
