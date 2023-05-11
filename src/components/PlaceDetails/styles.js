@@ -10,4 +10,11 @@ export default makeStyles(() => ({
   spacing: {
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
   },
+  feature: {
+    marginRight: 5
+  },
+  reportsQuantity: {
+    display: 'flex',
+    alignItems: 'flex-end'
+  }
 }));

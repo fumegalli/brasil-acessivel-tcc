@@ -5,6 +5,7 @@ import { getAccessiblePlacesData } from './api/accessibilityCloudAPI';
 import Header from './components/Header/Header';
 import List from './components/List/List';
 import Map from './components/Map/Map';
+import { getPlacesReportsData } from './api/brasilAcessivelAPI';
 
 const App = () => {
   const [places, setPlaces] = useState([]);
@@ -31,7 +32,7 @@ const App = () => {
 
   useEffect(() => {
     setFilteredPlaces(places.filter((place) => place.rating > rating));
-  }, [rating]);
+  }, [rating, places]);
 
   useEffect(() => {
     if(assistant){
@@ -39,37 +40,45 @@ const App = () => {
     } else {
       setFilteredPlaces(places);
     }
-  }, [assistant]);
+  }, [assistant, places]);
 
   useEffect(() => {
     if (bounds) {
       setIsLoading(true);
 
-      getAccessiblePlacesData(coords.lat, coords.lng, type)
-        .then((data) => {
-          let ap = data.filter((place) => place.properties.name).map((item) => {
-            const rating = (item.properties.accessibility?.accessibleWith?.wheelchair) ? 5.0 : (Math.random() * 4).toFixed(2) 
-            return {
-              "id": item.properties._id,
-              "name": item.properties.name.en,
-              "latitude": item.geometry.coordinates[1],
-              "longitude": item.geometry.coordinates[0],
-              "rating": Number(rating),
-              "category": {"name": item.properties.category},
-              "accessibility": item.properties.accessibility,
-              "description": item.properties.description,
-              "placeWebSiteURL": item.properties.placeWebsiteUrl,
-              "distance": item.properties.distance,
-              "phone": item.properties.phoneNumber
-            };
-          });
-          console.log('Accessible Places:', ap);
-          setPlaces(ap);
-          setFilteredPlaces(ap);
-          setIsLoading(false);
+      async function getData() {
+        const data = await getAccessiblePlacesData(coords.lat, coords.lng, type);
+        const accessiblePlaces = data.reduce((acc, { properties: place, geometry }) => {
+          if (!place.name) return acc;
+          const rating = (place.accessibility?.accessibleWith?.wheelchair) ? 5.0 : (Math.random() * 4).toFixed(2);
+          acc.push({
+            id: place._id,
+            name: place.name.en,
+            latitude: geometry.coordinates[1],
+            longitude: geometry.coordinates[0],
+            rating,
+            category: { name: place.category },
+            accessibility: place.accessibility,
+            description: place.description,
+            placeWebSiteURL: place.placeWebsiteUrl,
+            distance: place.distance,
+            phone: place.phoneNumber,
+          })
+          return acc;
+        }, []);
+        const reportsData = await getPlacesReportsData({ places: accessiblePlaces });
+        accessiblePlaces.forEach((place) => {
+          const placeReport = reportsData.places.find(({ id }) => id === place.id)
+          place.accessibleFeatures = placeReport.accessibleFeatures || [];
         });
+        setPlaces(accessiblePlaces);
+        setFilteredPlaces(accessiblePlaces);
+        setIsLoading(false);
+      }
+
+      getData();
     }
-  }, [bounds, type]);
+  }, [bounds, type, coords]);
 
   const onLoad = (autoC) => setAutocomplete(autoC);
 

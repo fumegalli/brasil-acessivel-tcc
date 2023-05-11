@@ -43,8 +43,8 @@ const List = ({ places, type, setType, rating, setAssistant, setRating, disabili
       ) : (
         <>
           <FormControl className={classes.formControl}>
-            <InputLabel id="disability">Deficiência</InputLabel>
-            <Select id="disability" value={disability} onChange={(e) => setDisability(e.target.value)}>
+            <InputLabel id="disability-label">Deficiência</InputLabel>
+            <Select id="disability-select" value={disability} onChange={(e) => setDisability(e.target.value)}>
               <MenuItem value="1">Paralesia parcial ou total de membros superiores</MenuItem>
               <MenuItem value="2">Paralesia parcial ou total de membros inferiores</MenuItem>
               <MenuItem value="3">Paralesia parcial ou total de todos os membros</MenuItem>
@@ -55,16 +55,16 @@ const List = ({ places, type, setType, rating, setAssistant, setRating, disabili
           </FormControl>
           <br />
           <FormControl className={classes.formControl}>
-            <InputLabel id="type">Tipo</InputLabel>
-            <Select id="type" value={type} onChange={(e) => setType(e.target.value)}>
+            <InputLabel id="type-label">Tipo</InputLabel>
+            <Select id="type-select" value={type} onChange={(e) => setType(e.target.value)}>
               <MenuItem value="">Todos</MenuItem>
               <MenuItem value="restaurant">Restaurantes</MenuItem>
               <MenuItem value="hotel">Hotéis</MenuItem>
             </Select>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <InputLabel id="rating">Acessibilidade</InputLabel>
-            <Select id="rating" value={rating} onChange={(e) => setRating(Number(e.target.value))}>
+            <InputLabel id="rating-label">Acessibilidade</InputLabel>
+            <Select id="rating-select" value={rating} onChange={(e) => setRating(Number(e.target.value))}>
               <MenuItem value="0">Todas</MenuItem>
               <MenuItem value="1">Acima de 1.0</MenuItem>
               <MenuItem value="2">Acima de 2.0</MenuItem>
@@ -74,7 +74,7 @@ const List = ({ places, type, setType, rating, setAssistant, setRating, disabili
             </Select>
           </FormControl>
           <FormControl className={classes.formControl}>
-            <FormControlLabel control={<Checkbox onChange={(e) => setAssistant(e.target.checked)} />} label="Assistênte de Acessibilidade" />
+            <FormControlLabel control={<Checkbox onChange={(e) => setAssistant(e.target.checked)} />} label="Assistente de Acessibilidade" />
           </FormControl>
           <Grid container spacing={3} className={classes.list}>
             {places?.map((place, i) => (
