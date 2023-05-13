@@ -3,6 +3,7 @@ import GoogleMapReact from 'google-map-react';
 import { Paper, Typography, useMediaQuery } from '@material-ui/core';
 import LocationOnOutlinedIcon from '@material-ui/icons/LocationOnOutlined';
 import Rating from '@material-ui/lab/Rating';
+import ImagePlaceholder from '../../assets/place_placeholder.jpg';
 
 import mapStyles from '../../mapStyles';
 import useStyles from './styles.js';
@@ -41,7 +42,7 @@ const Map = ({ coords, places, setCoords, setBounds, setChildClicked }) => {
                   <img
                     className={classes.pointer}
                     alt="place"
-                    src={place.photo ? place.photo.images.large.url : 'https://www.foodserviceandhospitality.com/wp-content/uploads/2016/09/Restaurant-Placeholder-001.jpg'}
+                    src={place.photo ? place.photo.images.large.url : ImagePlaceholder}
                   />
                   <Typography className={classes.typography} variant="caption" gutterBottom>Acessível a cadeira de rodas?</Typography>
                   <Typography gutterBottom variant="body1">
