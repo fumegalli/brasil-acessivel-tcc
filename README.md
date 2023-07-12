@@ -19,5 +19,5 @@ $ npm run start
 It will start on port 3000
 
 ## :hammer_and_wrench: Tools
-- [Material UI](https://nodejs.org/)
-- [React](https://nestjs.com/)
+- [Material UI](https://mui.com/)
+- [React](https://react.dev/)
